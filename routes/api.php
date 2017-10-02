@@ -13,10 +13,12 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+//Route::middleware('auth:api')->get('/user', function (Request $request) {
 
-    dd('russik');
+//    dd('russik');
 
-});
+//});
 
 Route::post('/register', 'Mobile\ClientController@register');
+Route::post('/authorization', 'Mobile\ClientController@authorization');
+Route::post('/reset', 'Mobile\ClientController@resetPassword');

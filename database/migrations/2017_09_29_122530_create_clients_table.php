@@ -29,6 +29,7 @@ class CreateClientsTable extends Migration
             $table->boolean('reviewer') ->default(false);
             $table->integer('rating') ->default(0);
             $table->boolean('changePreferences') ->default(true);
+            $table->string('token',228);
             $table->timestamps();
         });
     }
