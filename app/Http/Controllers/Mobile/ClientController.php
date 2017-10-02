@@ -120,20 +120,29 @@ class ClientController extends Controller
 
         }
 
-        $this -> sendMail(1);
+        $user_1 = Client::where("nickName", "=", $request -> login) ->
+                            orWhere("email", "=", $request -> login) ->
+                                first();
+        if($user_1){
+            $key =   rand(100000, 999999) ;
+            if($key < 0)
+                $key = $key * (-1);
 
+            DB::table('client_password_resets')->insert(
+                ['email' => $user_1 -> email, 'kod' => $key]
+            );
+            $this -> sendMail($user_1 -> email, $key);
+            return json_encode(["status" => "success", "errors" => "", "body" => null]);
+        }else{
+            return json_encode(["status" => "field error", "errors" => "Don't find user email", "body" => null]);
+        }
     }
 
 
-    public function sendMail($user){
-
-
-        Mail::send('mailers', ["user" => $user], function ($message){
-
-
-            $message->from('us@example.com', 'Laravel');
-            $message->to('z.kon2009@gmail.com','Drugak')->subject('Welcome to Odessa');
-            // $message->to('z.kon2009@gmail.com','Drugak')->subject('Welcome to Odessa');
+    public function sendMail($mail, $kod){
+        Mail::send('mailers', ["user" => $kod], function ($message) use ($mail){
+            $message->from('us@example.com', 'Spoon');
+            $message->to($mail,'Drugak')->subject('Password reset');
         });
 
     }
