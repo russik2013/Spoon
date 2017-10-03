@@ -22,3 +22,4 @@ use Illuminate\Http\Request;
 Route::post('/register', 'Mobile\ClientController@register');
 Route::post('/authorization', 'Mobile\ClientController@authorization');
 Route::post('/reset', 'Mobile\ClientController@resetPassword');
+Route::post('/check', 'Mobile\ClientController@checkKod');

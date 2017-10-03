@@ -22,16 +22,6 @@ class ClientController extends Controller
     protected $redirectAfterLogout = '/admin';
 
     public function register(Request $request){
-        //        DB::transaction(function() use ($request)
-//        {
-//            $client = new Client();
-//            $client -> fill($request -> all());
-//            $client -> save();
-//            $preferences = new Preference();
-//            $preferences -> client_id = $client->id;
-//            $preferences -> save();
-//        });
-
         $rules = [
             "email" => 'email|min:2|max:6',
             "password" => 'min:6|max:40',
@@ -119,7 +109,6 @@ class ClientController extends Controller
             return json_encode(["status" => "field error", "errors" => $validator -> messages() -> all(), "body" => null]);
 
         }
-
         $user_1 = Client::where("nickName", "=", $request -> login) ->
                             orWhere("email", "=", $request -> login) ->
                                 first();
@@ -132,18 +121,33 @@ class ClientController extends Controller
                 ['email' => $user_1 -> email, 'kod' => $key]
             );
             $this -> sendMail($user_1 -> email, $key);
-            return json_encode(["status" => "success", "errors" => "", "body" => null]);
+            return json_encode(["status" => "success", "errors" => "", "body" => $user_1 -> email]);
         }else{
             return json_encode(["status" => "field error", "errors" => "Don't find user email", "body" => null]);
         }
     }
 
 
-    public function sendMail($mail, $kod){
+    protected function sendMail($mail, $kod){
         Mail::send('mailers', ["user" => $kod], function ($message) use ($mail){
             $message->from('us@example.com', 'Spoon');
             $message->to($mail,'Drugak')->subject('Password reset');
         });
-
     }
+
+    public function checkKod(Request $request){
+       $user = DB::table('client_password_resets')->where('kod', '=', $request -> kod) ->where('email', '=', $request -> email) -> get() -> first();
+       if($user) {
+            $client = Client::where('email', '=',$user -> email) ->first();
+            if($client)
+                return json_encode(["status" => "success", "errors" => "", "body" => $client]);
+            else
+                return json_encode(["status" => "internal error", "errors" => "not find user", "body" => null]);
+       }else
+           return json_encode(["status" => "field error", "errors" => "wrong kod", "body" => null]);
+    }
+
+
+
+
 }
