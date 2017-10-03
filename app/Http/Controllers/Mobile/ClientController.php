@@ -17,9 +17,9 @@ use Illuminate\Support\Facades\Mail;
 
 class ClientController extends Controller
 {
-    use AuthenticatesUsers;
-    protected $redirectTo = '/admin';
-    protected $redirectAfterLogout = '/admin';
+//    use AuthenticatesUsers;
+ //   protected $redirectTo = '/admin';
+   // protected $redirectAfterLogout = '/admin';
 
     public function register(Request $request){
         $rules = [
@@ -48,6 +48,10 @@ class ClientController extends Controller
             $client = new Client();
             $client -> fill($request -> all());
             $client -> password = bcrypt($request -> password);
+            if( $request-> file) {
+                $request->file->move('images', $request->file->getClientOriginalName() . $request->file->extension());
+                $client->photo = 'images/' . $request->file->getClientOriginalName() . $request->file->extension();
+            }
             $client -> token =  str_random(32);
             $client -> save();
             $preferences = new Preference();
@@ -147,7 +151,44 @@ class ClientController extends Controller
            return json_encode(["status" => "field error", "errors" => "wrong kod", "body" => null]);
     }
 
+    public function editUser(Request $request){
+        $rules = [
+            "email" => 'email|min:2|max:6|valid_email',
+            "password" => 'min:6|max:40',
+            "firstName"=> 'alpha|min:2|max:40',
+            "lastName"=> 'alpha|min:2|max:40',
+            "middleName"=> 'alpha|min:2|max:40',
+            "nickName"=> 'alpha_dash|min:2|max:40|valid_nickname',
+            "sex" => 'in:MEN,WOMEN,ELSE',
+            "age" => 'between:3,300',
+            "photo" => 'image',
+            "rating" => 'between:0,100'
+        ];
+        $validator = Validator::make($request->all(),$rules);
+        if ($validator->fails()) {
 
+            return json_encode(["status" => "field error", "errors" => $validator -> messages() -> all(), "body" => null]);
+
+        }
+        DB::beginTransaction();
+        try{
+            $client = Client::find($request -> all());
+            $client -> fill($request -> all());
+            $client -> password = bcrypt($request -> password);
+            if( $request-> file) {
+                $request->file->move('images', $request->file->getClientOriginalName() . $request->file->extension());
+                $client->photo = 'images/' . $request->file->getClientOriginalName() . $request->file->extension();
+            }
+            $client -> token =  str_random(32);
+            $client -> save();
+        }
+        catch(QueryException $e){
+            DB::rollBack();
+            return json_encode(["status" => "internal error", "errors" => "some problem", "body" => null]);
+        }
+        DB::commit();
+        return json_encode(["status" => "success", "errors" => "", "body" => $client]);
+    }
 
 
 }

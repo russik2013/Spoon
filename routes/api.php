@@ -23,3 +23,12 @@ Route::post('/register', 'Mobile\ClientController@register');
 Route::post('/authorization', 'Mobile\ClientController@authorization');
 Route::post('/reset', 'Mobile\ClientController@resetPassword');
 Route::post('/check', 'Mobile\ClientController@checkKod');
+Route::post('/edit', 'Mobile\ClientController@editUser');
+
+Route::group(['prefix' => 'preference'], function () {
+
+    Route::post('/get', 'Mobile\PreferenceController@get');
+
+});
+
+//Route::post();

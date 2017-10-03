@@ -11,6 +11,18 @@ class Client extends Model
 
     protected $fillable = ['email','password','firebaseID','socialNetworkID','firstName','lastName','middleName',
                             'nickName','sex','age','photo','reviewer','rating','changePreferences'];
+
+
+    public function preference(){
+
+        return  $this -> hasOne('App\Preference', 'client_id', 'id');
+
+    }
+  //  public function historys(){
+
+  //      return  $this -> hasMany('App\TrailHistory', 'trail_id', 'id');
+
+  //  }
 }
 
 
