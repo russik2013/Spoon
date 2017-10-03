@@ -23,12 +23,12 @@ class ClientController extends Controller
 
     public function register(Request $request){
         $rules = [
-            "email" => 'email|min:2|max:6',
+            "email" => 'email|min:2|max:6|valid_email',
             "password" => 'min:6|max:40',
             "firstName"=> 'alpha|min:2|max:40',
             "lastName"=> 'alpha|min:2|max:40',
             "middleName"=> 'alpha|min:2|max:40',
-            "nickName"=> 'alpha_dash|min:2|max:40',
+            "nickName"=> 'alpha_dash|min:2|max:40|valid_nickname',
             "sex" => 'in:MEN,WOMEN,ELSE',
             "age" => 'between:3,300',
             "photo" => 'image',
