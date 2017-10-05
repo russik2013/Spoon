@@ -11,18 +11,14 @@ use Illuminate\Support\Facades\Validator;
 class PreferenceController extends Controller
 {
     public function get(Request $request){
-
-
         if(Client::find($request -> client_id))
          if(Client::find($request -> client_id)->preference)
             return json_encode(["status" => "success", "errors" => "", "body" => Client::find($request -> client_id)->preference]);
         else return json_encode(["status" => "internal error", "errors" => "not find preference", "body" => null]);
         else return json_encode(["status" => "internal error", "errors" => "not find user", "body" => null]);
-
     }
 
     public function edit(Request $request){
-
         $rules = [
             'AMERICAN' => 'numeric|between:0,100',
             'ASIAN' => 'numeric|between:0,100',
@@ -39,20 +35,20 @@ class PreferenceController extends Controller
             'STEAKHOUSE' => 'numeric|between:0,100',
             'SUSHI' => 'numeric|between:0,100',
         ];
-
         $validator = Validator::make($request->all(),$rules);
-
         if ($validator->fails()) {
-
             return json_encode(["status" => "field error", "errors" => $validator -> messages() -> all(), "body" => null]);
-
         }
-
+       // dd(Client::with('preference')->get());
         if(Client::find($request -> client_id))
-            if(Client::find($request -> client_id)->preference)
-                return json_encode(["status" => "success", "errors" => "", "body" => Client::find($request -> client_id)->preference]);
+            if(Client::find($request -> client_id)->preference){
+                    $preference = Client::find($request -> client_id)->preference;
+                    $preference -> fill($request -> all());
+                    $preference -> save();
+                return json_encode(["status" => "success", "errors" => "", "body" => $preference]);
+            }
             else return json_encode(["status" => "internal error", "errors" => "not find preference", "body" => null]);
         else return json_encode(["status" => "internal error", "errors" => "not find user", "body" => null]);
-
     }
+
 }

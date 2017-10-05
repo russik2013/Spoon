@@ -28,6 +28,13 @@ Route::post('/edit', 'Mobile\ClientController@editUser');
 Route::group(['prefix' => 'preference'], function () {
 
     Route::post('/get', 'Mobile\PreferenceController@get');
+    Route::post('/edit', 'Mobile\PreferenceController@edit');
+
+});
+
+Route::group(['prefix' => 'client'], function () {
+
+    Route::post('/get', 'Mobile\ClientController@get');
 
 });
 

@@ -16,6 +16,7 @@ class Client extends Model
     public function preference(){
 
         return  $this -> hasOne('App\Preference', 'client_id', 'id');
+       // return  $this -> hasOne('App\Preference');
 
     }
   //  public function historys(){

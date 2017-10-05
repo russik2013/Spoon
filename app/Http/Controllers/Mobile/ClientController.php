@@ -166,9 +166,7 @@ class ClientController extends Controller
         ];
         $validator = Validator::make($request->all(),$rules);
         if ($validator->fails()) {
-
             return json_encode(["status" => "field error", "errors" => $validator -> messages() -> all(), "body" => null]);
-
         }
         DB::beginTransaction();
         try{
@@ -190,5 +188,12 @@ class ClientController extends Controller
         return json_encode(["status" => "success", "errors" => "", "body" => $client]);
     }
 
+    public function get(Request $request){
+        $client = Client::find($request -> client_id);
+        if($client)
+            return json_encode(["status" => "success", "errors" => "", "body" => $client->get(['email','firstName','lastName','middleName',
+                'nickName','sex','age','photo','reviewer','rating','changePreferences'])]);
+        else return json_encode(["status" => "internal error", "errors" => "not find client", "body" => null]);
+    }
 
 }
