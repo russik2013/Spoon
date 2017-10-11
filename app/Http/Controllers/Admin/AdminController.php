@@ -6,7 +6,9 @@ use App\Restaurant;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
 
 class AdminController extends Controller
 {
@@ -65,6 +67,47 @@ class AdminController extends Controller
         $restaurant -> save();
 
         return redirect()->route('login');
+
+    }
+
+    public function reset(){
+
+        return view('admin.password_reset');
+
+    }
+
+    public function sendMail(Request $request){
+
+        $restaurant = Restaurant::where('email', '=', $request->email)->first();
+
+
+        if($restaurant) {
+
+            $kod =  str_random(32);
+            $restaurant_password_reset = DB::table('restaurant_password_reset') ->insert(['email' => $request -> email,
+                                                                                          'kod' => $kod,
+                                                                                          'restaurants_id' => $restaurant -> id]);
+            Mail::send('admin.password_reset_mail', ["user" => $restaurant, "kod" => $kod], function ($message) use ($request) {
+                $message->from('us@example.com', 'Spoon');
+                $message->to($request->email, 'Drugak')->subject('Password reset');
+                // $message->to('z.kon2009@gmail.com','Drugak')->subject('Welcome to Odessa');
+
+            });
+            return json_encode(['result' => 'done']);
+        }else return json_encode(['result' => 'wrong email']);
+
+
+    }
+
+    public function changePassword(){
+
+        return view('admin.change_password');
+
+    }
+
+    public function setNewPassword(Request $request){
+
+        dd($request -> all());
 
     }
 }

@@ -22,6 +22,12 @@ Route::get('/', function () {
 Route::get('/login', 'Admin\AdminController@index') -> name('login');
 Route::post('/login', 'Admin\AdminController@auth');
 
+Route::get('/reset', 'Admin\AdminController@reset');
+Route::post('/reset', 'Admin\AdminController@sendMail');
+
+Route::get('/change', 'Admin\AdminController@changePassword');
+Route::post('/change', 'Admin\AdminController@setNewPassword');
+
 Route::get('/register', 'Admin\AdminController@register');
 Route::post('/register', 'Admin\AdminController@createRestaurant');
 Route::post('/russik', 'Admin\AdminController@createRestaurant');

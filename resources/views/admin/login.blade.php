@@ -14,6 +14,6 @@
                 Login
             </button>
 
-
-
 </form>
+
+<a href="{{url('reset')}}">Восстановить пароль</a>
