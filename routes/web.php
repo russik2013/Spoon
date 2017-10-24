@@ -30,9 +30,41 @@ Route::post('/change', 'Admin\AdminController@setNewPassword');
 
 Route::get('/register', 'Admin\AdminController@register');
 Route::post('/register', 'Admin\AdminController@createRestaurant');
-Route::post('/russik', 'Admin\AdminController@createRestaurant');
 
 
+
+
+Route::group(['prefix' => 'restaurant', 'middleware' => 'auth'], function () {
+
+
+    Route::get('/', 'Restaurant\RestaurantController@index');
+    Route::get('/edit', 'Restaurant\RestaurantController@edit');
+    Route::post('/update', 'Restaurant\RestaurantController@update');
+
+    Route::group(['prefix' => 'preference'], function () {
+
+        Route::get('/', 'Restaurant\PreferenceController@index');
+
+
+    });
+
+});
+
+
+Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
+
+    Route::group(['prefix' => 'restaurant', 'middleware' => 'auth'], function () {
+
+
+        Route::group(['prefix' => 'preference'], function () {
+
+            Route::get('/edit', 'Restaurant\PreferenceController@edit');
+            Route::post('/update', 'Restaurant\PreferenceController@update');
+
+        });
+    });
+
+});
 
 Route::get('/job', function (){
     return view('test');

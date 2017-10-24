@@ -1,5 +1,4 @@
-change password
-
+@if(isset($_GET['email']))
 <p>Введите код</p>
 <input type="text" name="kod" id="kod">
 
@@ -14,7 +13,7 @@ change password
 
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-@if(isset($_GET['email']))
+
 <script>
 
     function sendData() {
@@ -24,15 +23,19 @@ change password
             data: {email : '{{$_GET['email']}}', _token : '{{csrf_token()}}', kod : $('#kod').val(), password : $('#password').val() }
         }).done(function( msg ) {
 
-            {{--msg = JSON.parse(msg);--}}
-            {{--if(msg['result'] == 'done'){--}}
+            msg = JSON.parse(msg);
+            if(msg['result'] == 'done'){
 
-                {{--alert('Сообщение было отправлено');--}}
-                {{--location.href = '{{url('/login')}}';--}}
+                alert('Пароль был изменен');
+                location.href = '{{url('/login')}}';
 
-            {{--}else{--}}
-                {{--alert('На такой почтовый ящик не зарегистрирован аккаунт');--}}
-            {{--}--}}
+            }
+            if(msg['result'] == 'kod error'){
+                alert('Код не верен');
+            }
+            if(msg['result'] == 'email error'){
+                alert('На такой почтовый ящик код не отправлялся');
+            }
         }) .fail(function( msg ) {
 
         });
@@ -41,6 +44,10 @@ change password
 
 
 </script>
+
+@else
+
+    На ваш почтовый ящик код не отправлялся
 
 @endif
 
