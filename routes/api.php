@@ -1,5 +1,7 @@
 <?php
 
+use App\Client;
+use App\Preference;
 use Illuminate\Http\Request;
 
 /*
@@ -18,6 +20,18 @@ use Illuminate\Http\Request;
 //    dd('russik');
 
 //});
+
+
+
+
+Route::post('/test', function (){
+    $client = Client::where('id',2)->get(['email','firstName','lastName','middleName',
+        'nickName','sex','age','photo','reviewer','rating','changePreferences']) -> first();
+
+    $client -> pref = Preference::where('client_id',2)->get(['AMERICAN','ASIAN','BAR','BURGER','CAFE','CHINESE','DESSERT','ITALIAN','JAPANESE','MEXICAN','PIZZA','SEAFOOD',
+        'STEAKHOUSE','SUSHI'])->first();
+    dd($client -> toJson());
+});
 
 Route::post('/register', 'Mobile\ClientController@register');
 Route::post('/authorization', 'Mobile\ClientController@authorization');

@@ -48,6 +48,16 @@ Route::group(['prefix' => 'restaurant', 'middleware' => 'auth'], function () {
 
     });
 
+    Route::group(['prefix' => 'products'], function () {
+
+        Route::get('/', 'Restaurant\ProductController@index');
+        Route::get('/add', 'Restaurant\ProductController@add');
+        Route::post('/create', 'Restaurant\ProductController@create');
+
+
+    });
+
+
 });
 
 

@@ -6,17 +6,6 @@
     <input type="hidden" name="_token" value="{{csrf_token()}}">
     <input type="hidden" name="_method" value="POST">
 
-
-    @if ($errors->any()&& $errors -> first('email'))
-        <div class="alert alert-danger">
-            {{$errors -> first('email')}}
-        </div>
-    @endif
-    <br>
-    Почта
-    <br>
-    <input id="email" type="email"  name="email" value="{{old('email', $restaurant -> email)}}">
-
     @if ($errors->any()&& $errors -> first('name'))
         <div class="alert alert-danger">
             {{$errors -> first('name')}}
@@ -73,19 +62,26 @@
     <input type="checkbox" @if($restaurant -> specify_time != null) checked @endif  name="specify_time" id="work_time">
     <div id="work_time_block">
         <p>Понедельник
-            <input id="monday_work_time" type="time" name="monday" value="{{old('monday', $restaurant -> monday)}}"></p>
+            с <input id="monday_work_time" type="time" name="monday_from" value="{{old('monday_from', $restaurant ->monday_from)}}">
+            по <input id="monday_work_time_to" type="time" name="monday_to" value="{{old('monday_to', $restaurant ->monday_to)}}"></p>
         <p>Вторник
-            <input id="tuesday_work_time" type="time" name="tuesday" value="{{old('tuesday', $restaurant ->tuesday)}}"></p>
+            с <input id="tuesday_work_time" type="time" name="tuesday_from" value="{{old('tuesday_from', $restaurant ->tuesday_from)}}">
+            по <input id="tuesday_work_time_to" type="time" name="tuesday_to" value="{{old('tuesday_to', $restaurant ->tuesday_to)}}"></p>
         <p>Среда
-            <input id="wednesday_work_time" type="time" name="wednesday" value="{{old('wednesday', $restaurant ->wednesday)}}"></p>
+            с <input id="wednesday_work_time" type="time" name="wednesday_from" value="{{old('wednesday_from', $restaurant ->wednesday_from)}}">
+            по <input id="wednesday_work_time_to" type="time" name="wednesday_to" value="{{old('wednesday_to', $restaurant ->wednesday_to)}}"></p>
         <p>Четверг
-            <input id="thursday_work_time" type="time" name="thursday" value="{{old('thursday', $restaurant ->thursday)}}"></p>
+            с <input id="thursday_work_time" type="time" name="thursday_from" value="{{old('thursday_from', $restaurant ->thursday_from)}}">
+            по <input id="thursday_work_time_to" type="time" name="thursday_to" value="{{old('thursday_to', $restaurant ->thursday_to)}}"></p>
         <p>Пятница
-            <input id="friday_work_time" type="time" name="friday" value="{{old('friday', $restaurant ->friday)}}"></p>
+            с <input id="friday_work_time" type="time" name="friday_from" value="{{old('friday_from', $restaurant ->friday_from)}}">
+            по <input id="friday_work_time_to" type="time" name="friday_to" value="{{old('friday_to', $restaurant ->friday_to)}}"></p>
         <p>Суббота
-            <input id="saturday_work_time" type="time" name="saturday" value="{{old('saturday', $restaurant ->saturday)}}"></p>
+            с <input id="saturday_work_time" type="time" name="saturday_from" value="{{old('saturday_from', $restaurant ->saturday_from)}}">
+            по <input id="saturday_work_time_to" type="time" name="saturday_to" value="{{old('saturday_to', $restaurant ->saturday_to)}}"></p>
         <p>Воскресенье
-            <input id="sunday_work_time" type="time" name="sunday" value="{{old('sunday', $restaurant ->sunday)}}"></p>
+            с <input id="sunday_work_time" type="time" name="sunday_from" value="{{old('sunday_from', $restaurant ->sunday_from)}}">
+            по <input id="sunday_work_time_to" type="time" name="sunday_to" value="{{old('sunday_to', $restaurant ->sunday_to)}}"></p>
     </div>
     @if ($errors->any()&& $errors -> first('address'))
         <div class="alert alert-danger">
@@ -109,16 +105,34 @@
 </form>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script>
-    $('#nets_name_block').hide();
-    $('#work_time_block').hide();
-    $("#monday_work_time").prop('disabled', true);
-    $("#tuesday_work_time").prop('disabled', true);
-    $("#wednesday_work_time").prop('disabled', true);
-    $("#thursday_work_time").prop('disabled', true);
-    $("#friday_work_time").prop('disabled', true);
-    $("#saturday_work_time").prop('disabled', true);
-    $("#sunday_work_time").prop('disabled', true);
-    $("#nets").prop('disabled', true);
+
+    @if($restaurant -> nets == null)
+     $('#nets_name_block').hide();
+     $("#nets").prop('disabled', true);
+    @endif
+
+    @if($restaurant -> specify_time == null)
+        $('#work_time_block').hide();
+
+
+        $("#monday_work_time").prop('disabled', true);
+        $("#tuesday_work_time").prop('disabled', true);
+        $("#wednesday_work_time").prop('disabled', true);
+        $("#thursday_work_time").prop('disabled', true);
+        $("#friday_work_time").prop('disabled', true);
+        $("#saturday_work_time").prop('disabled', true);
+        $("#sunday_work_time").prop('disabled', true);
+
+        $("#monday_work_time_to").prop('disabled', true);
+        $("#tuesday_work_time_to").prop('disabled', true);
+        $("#wednesday_work_time_to").prop('disabled', true);
+        $("#thursday_work_time_to").prop('disabled', true);
+        $("#friday_work_time_to").prop('disabled', true);
+        $("#saturday_work_time_to").prop('disabled', true);
+        $("#sunday_work_time_to").prop('disabled', true);
+    @endif
+
+
     $( document ).ready(function() {
         $('#nets_check').click(function(){
             if(this.checked) {
@@ -141,6 +155,14 @@
                 $("#friday_work_time").prop('disabled', false);
                 $("#saturday_work_time").prop('disabled', false);
                 $("#sunday_work_time").prop('disabled', false);
+
+                $("#monday_work_time_to").prop('disabled', false);
+                $("#tuesday_work_time_to").prop('disabled', false);
+                $("#wednesday_work_time_to").prop('disabled', false);
+                $("#thursday_work_time_to").prop('disabled', false);
+                $("#friday_work_time_to").prop('disabled', false);
+                $("#saturday_work_time_to").prop('disabled', false);
+                $("#sunday_work_time_to").prop('disabled', false);
             }else {
                 $('#work_time_block').hide();
                 $("#monday_work_time").prop('disabled', true);
@@ -150,12 +172,19 @@
                 $("#friday_work_time").prop('disabled', true);
                 $("#saturday_work_time").prop('disabled', true);
                 $("#sunday_work_time").prop('disabled', true);
+
+                $("#monday_work_time_to").prop('disabled', true);
+                $("#tuesday_work_time_to").prop('disabled', true);
+                $("#wednesday_work_time_to").prop('disabled', true);
+                $("#thursday_work_time_to").prop('disabled', true);
+                $("#friday_work_time_to").prop('disabled', true);
+                $("#saturday_work_time_to").prop('disabled', true);
+                $("#sunday_work_time_to").prop('disabled', true);
             }
 
 
         });
     });
-
 
 
 </script>

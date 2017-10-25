@@ -23,16 +23,12 @@ class ClientController extends Controller
 
     public function register(Request $request){
         $rules = [
-            "email" => 'email|min:2|max:6|valid_email',
-            "password" => 'min:6|max:40',
-            "firstName"=> 'alpha|min:2|max:40',
-            "lastName"=> 'alpha|min:2|max:40',
-            "middleName"=> 'alpha|min:2|max:40',
-            "nickName"=> 'alpha_dash|min:2|max:40|valid_nickname',
-            "sex" => 'in:MEN,WOMEN,ELSE',
-            "age" => 'between:3,300',
-            "photo" => 'image',
-            "rating" => 'between:0,100'
+            "email" => 'required|email|valid_email',
+            "password" => 'required|min:6|max:40',
+            "firstName"=> 'required|alpha|min:2|max:40',
+            "lastName"=> 'required|alpha|min:2|max:40',
+            "firebaseID" => 'required'
+
         ];
 
         $validator = Validator::make($request->all(),$rules);
@@ -57,13 +53,22 @@ class ClientController extends Controller
             $preferences = new Preference();
             $preferences -> client_id = $client -> id;
             $preferences -> save();
+
+
+            $user = Client::where('id',$client -> id)->get(['id', 'token','email','firstName','lastName','middleName',
+                'nickName','sex','age','photo','reviewer','rating','changePreferences']) -> first();
+
+            $user -> pref = Preference::where('client_id', '=', $client -> id)->get(['AMERICAN','ASIAN',
+                'BAR','BURGER','CAFE','CHINESE','DESSERT','ITALIAN','JAPANESE','MEXICAN','PIZZA','SEAFOOD',
+                'STEAKHOUSE','SUSHI'])->first();
         }
         catch(QueryException $e){
             DB::rollBack();
-            return json_encode(["status" => "internal error", "errors" => "some problem", "body" => null]);
+            return json_encode(["status" => "internal error", "errors" => ["some problem"], "body" => null]);
         }
         DB::commit();
-        return json_encode(["status" => "success", "errors" => "", "body" => $client]);
+
+        return json_encode(["status" => "success", "errors" => [],"body" => $user]);
 
     }
 
@@ -84,7 +89,7 @@ class ClientController extends Controller
 
           //  dd($user -> password);
             if(Hash::check($request -> password,$user -> password))
-                return json_encode(["status" => "success", "errors" => "", "body" => $user]);
+                return json_encode(["status" => "success", "errors" => [], "body" => $user]);
 
         }
         $users_2 = Client::where("nickName", "=", $request -> login) ->get();
@@ -92,13 +97,13 @@ class ClientController extends Controller
         foreach ($users_2 as $user){
 
             if(Hash::check($request -> password,$user -> password))
-                return json_encode(["status" => "success", "errors" => "", "body" => $user]);
+                return json_encode(["status" => "success", "errors" => [], "body" => $user]);
 
         }
         if(!$users_1->isEmpty() || !$users_2->isEmpty())
-            return json_encode(["status" => "field error", "errors" => "Invalid password field", "body" => null]);
+            return json_encode(["status" => "field error", "errors" => ["Invalid password field"], "body" => null]);
         else
-            return json_encode(["status" => "field error", "errors" => "Invalid login field", "body" => null]);
+            return json_encode(["status" => "field error", "errors" => ["Invalid login field"], "body" => null]);
 
     }
 
@@ -125,9 +130,9 @@ class ClientController extends Controller
                 ['email' => $user_1 -> email, 'kod' => $key]
             );
             $this -> sendMail($user_1 -> email, $key);
-            return json_encode(["status" => "success", "errors" => "", "body" => $user_1 -> email]);
+            return json_encode(["status" => "success", "errors" => [], "body" => $user_1 -> email]);
         }else{
-            return json_encode(["status" => "field error", "errors" => "Don't find user email", "body" => null]);
+            return json_encode(["status" => "field error", "errors" => ["Don't find user email"], "body" => null]);
         }
     }
 
@@ -144,7 +149,7 @@ class ClientController extends Controller
        if($user) {
             $client = Client::where('email', '=',$user -> email) ->first();
             if($client)
-                return json_encode(["status" => "success", "errors" => "", "body" => $client]);
+                return json_encode(["status" => "success", "errors" => [], "body" => $client]);
             else
                 return json_encode(["status" => "internal error", "errors" => "not find user", "body" => null]);
        }else
@@ -153,12 +158,12 @@ class ClientController extends Controller
 
     public function editUser(Request $request){
         $rules = [
-            "email" => 'email|min:2|max:6|valid_email',
+            "email" => 'email|min:2|max:6',
             "password" => 'min:6|max:40',
             "firstName"=> 'alpha|min:2|max:40',
             "lastName"=> 'alpha|min:2|max:40',
             "middleName"=> 'alpha|min:2|max:40',
-            "nickName"=> 'alpha_dash|min:2|max:40|valid_nickname',
+            "nickName"=> 'alpha_dash|min:2|max:40',
             "sex" => 'in:MEN,WOMEN,ELSE',
             "age" => 'between:3,300',
             "photo" => 'image',

@@ -40,15 +40,15 @@ class AdminController extends Controller
 
 
         $rules = [
-            'email' =>'email|required|valid_restaurant_email',
-            'password' => 'min:2|max:40',
-            'name' => 'alpha_dash|min:2|max:40',
-            'nets' => 'alpha_dash|min:2|max:40',
-            'category' => 'alpha_dash|min:2|max:40',
-            'description' => 'min:2|max:512',
-            'phone' => 'numeric',
-            'average_check' => 'numeric|min:1|max:99999',
-            'photos' => 'image',
+            'email' =>'required|email|required|valid_restaurant_email',
+            'password' => 'required|min:2|max:40',
+            'name' => 'required|alpha_dash|min:2|max:40',
+            'nets' => 'required|alpha_dash|min:2|max:40',
+            'category' => 'required|alpha_dash|min:2|max:40',
+            'description' => 'required|min:2|max:512',
+            'phone' => 'required|numeric',
+            'average_check' => 'required|numeric|min:1|max:99999',
+            'photos' => 'required|image',
             "monday_from" => "required_if:specify_time,==,on",
             "monday_to" => "required_if:specify_time,==,on",
             "tuesday_from" => "required_if:specify_time,==,on",
@@ -68,10 +68,9 @@ class AdminController extends Controller
         $validator = Validator::make($request->all(),$rules);
         if ($validator->fails()) {
 
-            dd($validator -> messages() -> all());
             return redirect()->back()->withErrors($validator)->withInput();// $validator->errors()->all();;
         }
-        dd($request -> all());
+
         DB::beginTransaction();
         try{
             $restaurant = new Restaurant();
@@ -89,6 +88,7 @@ class AdminController extends Controller
             }
             else
                 $restaurant -> specify_time = false;
+
             $restaurant -> location = 'russik';
 
             $restaurant -> password = bcrypt($request -> password);

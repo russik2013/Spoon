@@ -30,4 +30,16 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+
+    public function preference(){
+
+       return $this -> hasOne('App\RestaurantPreference','restaurants_id','id');
+
+    }
+
+    public function products(){
+
+        return $this -> hasMany('App\Products','restaurants_id','id');
+    }
 }
