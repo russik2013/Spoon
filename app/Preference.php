@@ -16,5 +16,6 @@ class Preference extends Model
         return  $this ->belongsTo('App\Client');
 
     }
+
 }
 

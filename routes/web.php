@@ -53,6 +53,10 @@ Route::group(['prefix' => 'restaurant', 'middleware' => 'auth'], function () {
         Route::get('/', 'Restaurant\ProductController@index');
         Route::get('/add', 'Restaurant\ProductController@add');
         Route::post('/create', 'Restaurant\ProductController@create');
+        Route::get('/{id}/edit','Restaurant\ProductController@edit');
+        Route::post('/{id}/update','Restaurant\ProductController@update');
+        Route::get('/{id}/delete','Restaurant\ProductController@delete');
+       // Route::post('/{id}/delete','Restaurant\ProductController@delete');
 
 
     });

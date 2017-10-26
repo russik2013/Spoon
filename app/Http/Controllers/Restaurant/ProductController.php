@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Restaurant;
 
+use App\Preference;
 use App\Products;
 use App\RestaurantPreference;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
@@ -38,16 +40,12 @@ class ProductController extends Controller
             'unit_of_measurement' => 'required|in:KILO,LITER,GRAMS,MILLILITER',
             'cooking_time' => 'required|numeric|min:0|max:999',
             'ingredients' => 'required',
+            'image' => 'image'
         ];
         $validator = Validator::make($request->all(),$rules);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();// $validator->errors()->all();;
         }
-
-        $this ->changePreferences(Auth::user()->id);
-
-        dd($request -> all());
-
 
         $product = new Products();
 
@@ -59,19 +57,93 @@ class ProductController extends Controller
 
         $product -> save();
 
+        $newPreferences =  $this ->getNewPreferences(Auth::user()->id);
+
+        $this ->changePreferences(Auth::user()->id, $newPreferences);
+
+        return redirect('/restaurant/products');
+
+    }
+
+    private function getNewPreferences($id){
+
+        $alls = User::find($id) -> products()  -> get() -> groupBy('kitchen');
+
+        foreach ($alls as $key => $value){
+
+            $dataAboutCounts[$key] = $value -> count();
+
+        }
+
+        return $dataAboutCounts;
+
+
+        // $mostPriorityKitchen = max($dataAboutCounts);
+    }
+
+    private function changePreferences($id, $preferences){
+
+        $alls = User::find($id)  -> preference() -> first();
+
+        $alls -> getDefaults($alls -> id);
+
+        $mostPriorityKitchen = max($preferences);
+
+        foreach ($preferences as $key => $preference){
+            $preferences[$key] = ($preference / $mostPriorityKitchen) * 100;
+        }
+
+        $alls -> fill($preferences);
+
+        $alls -> save();
+
+    }
+
+    public function edit($id){
+
+        $product = Products::find($id);
+
+        $kitchens = DB::table('kitchen_types')->get();
+
+        if ($product -> restaurants_id != Auth::user() -> id)
+            return redirect('/restaurant/products');
+
+
+        return view('restaurant.products.edit', compact('product', 'kitchens'));
+
+    }
+
+    public function update($id, Request $request){
+
+        $product = Products::find($id);
+
+        if ($product -> restaurants_id != Auth::user() -> id)
+            return json_encode(['status' => 'error', 'message' => "you can't edit this product"]);
+
+        $product -> fill($request -> all());
+
+        $product -> save();
+
+        $newPreferences =  $this ->getNewPreferences(Auth::user()->id);
+
+        $this ->changePreferences(Auth::user()->id, $newPreferences);
+
+        return redirect('/restaurant/products');
 
 
     }
 
-    private function changePreferences($id){
+    public function delete($id){
 
-        dd(User::find($id) -> products() -> get());
-           //->distinct()
-        dd(User::find($id) -> preference() -> first());
+        Products::find($id) -> delete();
 
+        $newPreferences =  $this ->getNewPreferences(Auth::user()->id);
 
+        $this ->changePreferences(Auth::user()->id, $newPreferences);
 
+        return redirect('/restaurant/products');
 
     }
+
 
 }
