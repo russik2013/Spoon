@@ -67,6 +67,9 @@ Route::group(['prefix' => 'restaurant', 'middleware' => 'auth'], function () {
 
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
+    Route::get('/', 'Admin\HomeController@index')->middleware('admin_restaurant');
+
+//////////////////////////////Контроль ресторанов/////////////////////////////////////
     Route::group(['prefix' => 'restaurant', 'middleware' => 'auth'], function () {
 
 
@@ -76,6 +79,17 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
             Route::post('/update', 'Restaurant\PreferenceController@update');
 
         });
+    });
+/////////////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////Контроль ключей регистрации/////////////////////////////////////
+    Route::group(['prefix' => 'keys'], function () {
+
+        Route::get('/', 'Admin\RegisterKeyController@index')->middleware('admin_restaurant');
+        Route::post('/create', 'Admin\RegisterKeyController@create')->middleware('admin_restaurant');
+
+
     });
 
 });

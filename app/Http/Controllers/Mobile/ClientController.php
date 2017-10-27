@@ -83,23 +83,57 @@ class ClientController extends Controller
             return json_encode(["status" => "field error", "errors" => $validator -> messages() -> all(), "body" => null]);
 
         }
+
+        if($request -> firebaseID) {
+
+            $client = Client::where('firebaseID', '=', $request->firebaseID) -> first();
+
+            if($client) {
+                $client->firebaseID = '';
+
+                $client->save();
+            }
+        }
+
+        $client_id = 0;
         $users_1 = Client::where("email", "=", $request -> login) ->get();
         if(!$users_1->isEmpty())
         foreach ($users_1 as $user){
 
           //  dd($user -> password);
-            if(Hash::check($request -> password,$user -> password))
-                return json_encode(["status" => "success", "errors" => [], "body" => $user]);
+            if(Hash::check($request -> password,$user -> password)) {
+                $user -> firebaseID = $request -> firebaseID;
+                $user -> save();
+
+                $client_id = $user -> id;
+            }
 
         }
         $users_2 = Client::where("nickName", "=", $request -> login) ->get();
         if(!$users_2->isEmpty())
         foreach ($users_2 as $user){
 
-            if(Hash::check($request -> password,$user -> password))
-                return json_encode(["status" => "success", "errors" => [], "body" => $user]);
+            if(Hash::check($request -> password,$user -> password)) {
+
+                $user -> firebaseID = $request -> firebaseID;
+                $user -> save();
+
+                $client_id = $user -> id;
+            }
 
         }
+
+        if($client_id != 0){
+
+            $user = Client::where('id', '=', $client_id) -> get(['id', 'token','email','firstName','lastName',
+                'middleName','nickName','sex','age','photo','reviewer','rating','changePreferences']) ->first() ;
+
+            $user -> pref = $user->preference() -> get(['AMERICAN','ASIAN','BAR','BURGER','CAFE','CHINESE','DESSERT',
+                'ITALIAN','JAPANESE','MEXICAN','PIZZA','SEAFOOD','STEAKHOUSE','SUSHI']) -> first();
+
+            return json_encode(["status" => "success", "errors" => [], "body" => $user]);
+        }
+
         if(!$users_1->isEmpty() || !$users_2->isEmpty())
             return json_encode(["status" => "field error", "errors" => ["Invalid password field"], "body" => null]);
         else

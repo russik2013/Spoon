@@ -38,6 +38,7 @@ class CreateRestaurantsTable extends Migration
             $table->integer('rating') ->default(0);
             $table->boolean('display_tables') ->default(false);
             $table->integer('number_of_free_tables') ->default(-1);
+            $table->string('role',228) ->default('user');
             $table->timestamps();
         });
     }

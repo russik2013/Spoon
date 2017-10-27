@@ -21,10 +21,15 @@ class AdminController extends Controller
 
     public function auth(Request $request){
 
-        //dd($request ->all());
+
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password]))
         {
-            return redirect()->intended('restaurant');
+
+            if(Auth::user()->role == 'user')
+                return redirect()->intended('restaurant');
+
+            if(Auth::user()->role == 'admin')
+                return redirect()->intended('admin');
         }
 
         return back()->withErrors(array('login_error' => 'Не верные данные'));
@@ -37,6 +42,8 @@ class AdminController extends Controller
     }
 
     public function createRestaurant(Request $request){
+
+
 
 
         $rules = [

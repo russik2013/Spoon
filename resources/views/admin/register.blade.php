@@ -1,6 +1,18 @@
 <form  method="post" action="{{url('/register')}}" enctype="multipart/form-data">
     <input type="hidden" name="_token" value="{{csrf_token()}}">
     <input type="hidden" name="_method" value="POST">
+
+
+
+    <br>
+    Ключ регистрации
+    <br>
+    <input id="register_key" type="text"  name="register_key" value="{{old('register_key')}}">
+
+
+
+
+
     @if ($errors->any()&& $errors -> first('email'))
         <div class="alert alert-danger">
             {{$errors -> first('email')}}
@@ -9,7 +21,7 @@
     <br>
     Почта
     <br>
-    <input id="email" type="email"  name="email" value="{{old('email')}}">
+    <input id="email" type="text"  name="email" value="{{old('email')}}">
     @if ($errors->any()&& $errors -> first('password'))
         <div class="alert alert-danger">
             {{$errors -> first('password')}}
