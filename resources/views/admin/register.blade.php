@@ -3,14 +3,15 @@
     <input type="hidden" name="_method" value="POST">
 
 
-
+    @if ($errors->any()&& $errors -> first('register_key'))
+        <div class="alert alert-danger">
+            {{$errors -> first('register_key')}}
+        </div>
+    @endif
     <br>
     Ключ регистрации
     <br>
     <input id="register_key" type="text"  name="register_key" value="{{old('register_key')}}">
-
-
-
 
 
     @if ($errors->any()&& $errors -> first('email'))

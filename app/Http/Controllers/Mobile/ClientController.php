@@ -181,7 +181,15 @@ class ClientController extends Controller
     public function checkKod(Request $request){
        $user = DB::table('client_password_resets')->where('kod', '=', $request -> kod) ->where('email', '=', $request -> email) -> get() -> first();
        if($user) {
-            $client = Client::where('email', '=',$user -> email) ->first();
+
+            $client = Client::where('email', '=',$user -> email)->get(['id', 'token','email','firstName','lastName','middleName',
+               'nickName','sex','age','photo','reviewer','rating','changePreferences']) -> first();
+
+            $client -> pref = Preference::where('client_id', '=', $client -> id)->get(['AMERICAN','ASIAN',
+               'BAR','BURGER','CAFE','CHINESE','DESSERT','ITALIAN','JAPANESE','MEXICAN','PIZZA','SEAFOOD',
+               'STEAKHOUSE','SUSHI'])->first();
+
+            DB::table('client_password_resets') ->where('email', '=', $request -> email) -> delete();
             if($client)
                 return json_encode(["status" => "success", "errors" => [], "body" => $client]);
             else
@@ -192,7 +200,7 @@ class ClientController extends Controller
 
     public function editUser(Request $request){
         $rules = [
-            "email" => 'email|min:2|max:6',
+            "email" => 'email|min:2',
             "password" => 'min:6|max:40',
             "firstName"=> 'alpha|min:2|max:40',
             "lastName"=> 'alpha|min:2|max:40',
@@ -211,6 +219,7 @@ class ClientController extends Controller
         try{
             $client = Client::find($request -> all());
             $client -> fill($request -> all());
+            if($request -> password)
             $client -> password = bcrypt($request -> password);
             if( $request-> file) {
                 $request->file->move('images', $request->file->getClientOriginalName() . $request->file->extension());

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Client;
+use App\RegisterKey;
 use App\Restaurant;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
@@ -42,6 +43,15 @@ class AppServiceProvider extends ServiceProvider
             else return true;
 
         },'NickName in use');
+
+        Validator::extend('check_key', function ($attribute, $value){
+
+            if(RegisterKey::where('key_text', '=', $value) -> first())
+                return  true;
+            else return false;
+
+        },'Invalid key');
+
 
 
         Validator::extend('numeric_size', function ($attribute, $value,$parameters){

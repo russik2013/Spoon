@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\RegisterKey;
 use App\Restaurant;
 use App\RestaurantPreference;
 use Illuminate\Http\Request;
@@ -44,13 +45,12 @@ class AdminController extends Controller
     public function createRestaurant(Request $request){
 
 
-
-
         $rules = [
+            'register_key' => 'required|check_key',
             'email' =>'required|email|required|valid_restaurant_email',
             'password' => 'required|min:2|max:40',
             'name' => 'required|alpha_dash|min:2|max:40',
-            'nets' => 'required|alpha_dash|min:2|max:40',
+            'nets' => 'required_if:nets_check,==,on|alpha_dash|min:2|max:40',
             'category' => 'required|alpha_dash|min:2|max:40',
             'description' => 'required|min:2|max:512',
             'phone' => 'required|numeric',
@@ -76,6 +76,13 @@ class AdminController extends Controller
         if ($validator->fails()) {
 
             return redirect()->back()->withErrors($validator)->withInput();// $validator->errors()->all();;
+        }
+
+
+        if(!$this -> checkKey($request -> register_key)){
+
+            return redirect()->back()->withErrors(['register_key' => 'no more restaurant to register'])->withInput();
+
         }
 
         DB::beginTransaction();
@@ -123,6 +130,15 @@ class AdminController extends Controller
 
         return view('admin.password_reset');
 
+    }
+
+    protected function checkKey($key){
+        $key = RegisterKey::where('key_text', '=', $key) -> first();
+        if($key -> restaurant_count > 0){
+            $key -> restaurant_count = $key -> restaurant_count - 1;
+            $key -> save();
+             return true;
+        }else return false;
     }
 
     public function sendMail(Request $request){

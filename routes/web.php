@@ -88,10 +88,24 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
         Route::get('/', 'Admin\RegisterKeyController@index')->middleware('admin_restaurant');
         Route::post('/create', 'Admin\RegisterKeyController@create')->middleware('admin_restaurant');
+        Route::post('/all', 'Admin\RegisterKeyController@getAllKeys')->middleware('admin_restaurant');
+        Route::post('/delete', 'Admin\RegisterKeyController@delete')->middleware('admin_restaurant');
+        Route::post('/get', 'Admin\RegisterKeyController@getKey')->middleware('admin_restaurant');
+
+
+    });
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////Контроль пользователей/////////////////////////////////////////////
+    Route::group(['prefix' => 'clients'], function () {
+
+        Route::get('/', 'Admin\ClientController@index')->middleware('admin_restaurant');
 
 
     });
 
+/////////////////////////////////////////////////////////////////////////////////////////////////
 });
 
 Route::get('/job', function (){
