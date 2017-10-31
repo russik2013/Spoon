@@ -54,13 +54,6 @@ class ClientController extends Controller
             $preferences -> client_id = $client -> id;
             $preferences -> save();
 
-
-            $user = Client::where('id',$client -> id)->get(['id', 'token','email','firstName','lastName','middleName',
-                'nickName','sex','age','photo','reviewer','rating','changePreferences']) -> first();
-
-            $user -> pref = Preference::where('client_id', '=', $client -> id)->get(['AMERICAN','ASIAN',
-                'BAR','BURGER','CAFE','CHINESE','DESSERT','ITALIAN','JAPANESE','MEXICAN','PIZZA','SEAFOOD',
-                'STEAKHOUSE','SUSHI'])->first();
         }
         catch(QueryException $e){
             DB::rollBack();
@@ -68,7 +61,7 @@ class ClientController extends Controller
         }
         DB::commit();
 
-        return json_encode(["status" => "success", "errors" => [],"body" => $user]);
+        return json_encode(["status" => "success", "errors" => [],"body" => $this -> getClient('id', $client -> id)]);
 
     }
 
@@ -125,13 +118,7 @@ class ClientController extends Controller
 
         if($client_id != 0){
 
-            $user = Client::where('id', '=', $client_id) -> get(['id', 'token','email','firstName','lastName',
-                'middleName','nickName','sex','age','photo','reviewer','rating','changePreferences']) ->first() ;
-
-            $user -> pref = $user->preference() -> get(['AMERICAN','ASIAN','BAR','BURGER','CAFE','CHINESE','DESSERT',
-                'ITALIAN','JAPANESE','MEXICAN','PIZZA','SEAFOOD','STEAKHOUSE','SUSHI']) -> first();
-
-            return json_encode(["status" => "success", "errors" => [], "body" => $user]);
+            return json_encode(["status" => "success", "errors" => [], "body" => $this -> getClient('id', $client_id)]);
         }
 
         if(!$users_1->isEmpty() || !$users_2->isEmpty())
@@ -182,16 +169,10 @@ class ClientController extends Controller
        $user = DB::table('client_password_resets')->where('kod', '=', $request -> kod) ->where('email', '=', $request -> email) -> get() -> first();
        if($user) {
 
-            $client = Client::where('email', '=',$user -> email)->get(['id', 'token','email','firstName','lastName','middleName',
-               'nickName','sex','age','photo','reviewer','rating','changePreferences']) -> first();
-
-            $client -> pref = Preference::where('client_id', '=', $client -> id)->get(['AMERICAN','ASIAN',
-               'BAR','BURGER','CAFE','CHINESE','DESSERT','ITALIAN','JAPANESE','MEXICAN','PIZZA','SEAFOOD',
-               'STEAKHOUSE','SUSHI'])->first();
-
             DB::table('client_password_resets') ->where('email', '=', $request -> email) -> delete();
-            if($client)
-                return json_encode(["status" => "success", "errors" => [], "body" => $client]);
+
+            if( $this -> getClient('email', $user -> email))
+                return json_encode(["status" => "success", "errors" => [], "body" =>  $this -> getClient('email', $user -> email)]);
             else
                 return json_encode(["status" => "internal error", "errors" => "not find user", "body" => null]);
        }else
@@ -202,9 +183,9 @@ class ClientController extends Controller
         $rules = [
             "email" => 'email|min:2',
             "password" => 'min:6|max:40',
-            "firstName"=> 'alpha|min:2|max:40',
-            "lastName"=> 'alpha|min:2|max:40',
-            "middleName"=> 'alpha|min:2|max:40',
+            "firstName"=> 'alpha_dash|min:2|max:40',
+            "lastName"=> 'alpha_dash|min:2|max:40',
+            "middleName"=> 'alpha_dash|min:2|max:40',
             "nickName"=> 'alpha_dash|min:2|max:40',
             "sex" => 'in:MEN,WOMEN,ELSE',
             "age" => 'between:3,300',
@@ -217,7 +198,7 @@ class ClientController extends Controller
         }
         DB::beginTransaction();
         try{
-            $client = Client::find($request -> all());
+            $client = Client::find($request -> id);
             $client -> fill($request -> all());
             if($request -> password)
             $client -> password = bcrypt($request -> password);
@@ -225,7 +206,7 @@ class ClientController extends Controller
                 $request->file->move('images', $request->file->getClientOriginalName() . $request->file->extension());
                 $client->photo = 'images/' . $request->file->getClientOriginalName() . $request->file->extension();
             }
-            $client -> token =  str_random(32);
+            //$client -> token =  str_random(32);
             $client -> save();
         }
         catch(QueryException $e){
@@ -233,7 +214,8 @@ class ClientController extends Controller
             return json_encode(["status" => "internal error", "errors" => "some problem", "body" => null]);
         }
         DB::commit();
-        return json_encode(["status" => "success", "errors" => "", "body" => $client]);
+
+        return json_encode(["status" => "success", "errors" => [], "body" => $this -> getClient('id', $client -> id)]);
     }
 
     public function get(Request $request){
@@ -242,6 +224,19 @@ class ClientController extends Controller
             return json_encode(["status" => "success", "errors" => "", "body" => $client->get(['email','firstName','lastName','middleName',
                 'nickName','sex','age','photo','reviewer','rating','changePreferences'])]);
         else return json_encode(["status" => "internal error", "errors" => "not find client", "body" => null]);
+    }
+
+    private function getClient($field, $value){
+
+        $client = Client::where($field, '=',$value)->get(['id', 'token','email','firstName','lastName','middleName',
+            'nickName','sex','age','photo','reviewer','rating','changePreferences']) -> first();
+
+        $client -> pref = Preference::where('client_id', '=', $client -> id)->get(['AMERICAN','ASIAN',
+            'BAR','BURGER','CAFE','CHINESE','DESSERT','ITALIAN','JAPANESE','MEXICAN','PIZZA','SEAFOOD',
+            'STEAKHOUSE','SUSHI'])->first();
+
+        return $client;
+
     }
 
 }

@@ -30,6 +30,7 @@ class CreateClientsTable extends Migration
             $table->integer('rating') ->default(0);
             $table->boolean('changePreferences') ->default(true);
             $table->string('token',228);
+            $table->boolean('access') ->default(true);
             $table->timestamps();
         });
     }

@@ -31,7 +31,9 @@ Route::post('/change', 'Admin\AdminController@setNewPassword');
 Route::get('/register', 'Admin\AdminController@register');
 Route::post('/register', 'Admin\AdminController@createRestaurant');
 
-
+Route::get('/404', function (){
+    return view('404');
+});
 
 
 Route::group(['prefix' => 'restaurant', 'middleware' => 'auth'], function () {
@@ -100,7 +102,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 //////////////////////////////Контроль пользователей/////////////////////////////////////////////
     Route::group(['prefix' => 'clients'], function () {
 
-        Route::get('/', 'Admin\ClientController@index')->middleware('admin_restaurant');
+        Route::get('/{page}', 'Admin\ClientController@index')->middleware('admin_restaurant');
+        Route::get('/{id}/edit', 'Admin\ClientController@edit')->middleware('admin_restaurant');
+        Route::post('/{id}/update', 'Admin\ClientController@update')->middleware('admin_restaurant');
+        Route::post('/change', 'Admin\ClientController@changeStatus')->middleware('admin_restaurant');
+        Route::post('/reviewer', 'Admin\ClientController@changeReviewer')->middleware('admin_restaurant');
+
 
 
     });
