@@ -1,66 +1,34 @@
 <?php
 
-namespace App\Http\Controllers\Restaurant;
+namespace App\Http\Controllers\Admin;
 
+use App\Products;
 use App\Restaurant;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class RestaurantController extends Controller
 {
     public function index(){
 
+        $restaurants = Restaurant::where('role','user') -> get();
 
-        $restaurant = Auth::user();
-
-        return view('restaurant.home', compact('restaurant'));
-
-    }
-
-    public function edit(){
-
-        $restaurant = Auth::user();
-
-
-        $monday = explode('-', Auth::user() -> monday);
-        $tuesday = explode('-', Auth::user() -> tuesday);
-        $wednesday = explode('-', Auth::user() -> wednesday);
-        $thursday = explode('-', Auth::user() -> thursday);
-        $friday = explode('-', Auth::user() -> friday);
-        $saturday = explode('-', Auth::user() -> saturday);
-        $sunday = explode('-', Auth::user() -> sunday);
-
-        Auth::user() -> monday_from = $monday[0];
-        Auth::user() -> monday_to = $monday[1];
-
-        Auth::user() ->tuesday_from = $tuesday[0];
-        Auth::user() ->tuesday_to = $tuesday[1];
-
-        Auth::user() ->wednesday_from = $wednesday[0];
-        Auth::user() ->wednesday_to = $wednesday[1];
-
-        Auth::user() ->thursday_from = $thursday[0];
-        Auth::user() ->thursday_to = $thursday[1];
-
-        Auth::user() ->friday_from = $friday[0];
-        Auth::user() ->friday_to = $friday[1];
-
-        Auth::user() ->saturday_from = $saturday[0];
-        Auth::user() ->saturday_to = $saturday[1];
-
-        Auth::user() ->sunday_from = $sunday[0];
-        Auth::user() ->sunday_to = $sunday[1];
-
-
-
-        return view('restaurant.edit', compact('restaurant'));
+        return view('admin.restaurant.index', compact('restaurants'));
 
     }
 
-    public function update(Request $request){
 
+    public function edit($id){
+
+        $restaurant = Restaurant::find($id);
+
+        return view('admin.restaurant.edit', compact('restaurant'));
+
+    }
+
+    public function update($id, Request $request){
         $rules = [
             'password' => 'min:2|max:40',
             'name' => 'alpha_dash|min:2|max:40',
@@ -91,15 +59,54 @@ class RestaurantController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();// $validator->errors()->all();;
         }
 
-
-
-        $restaurant = Auth::user();
+        $restaurant = Restaurant::find($id);
 
         $restaurant ->fill($request -> all());
 
         $restaurant -> save();
 
-        return view('restaurant.edit', compact('restaurant'));
+        return redirect('/admin/restaurant');
 
     }
+
+    public function menu($id){
+
+        $products = Restaurant::find($id) -> products;
+
+        return view('admin.restaurant.menu', compact('products'));
+    }
+
+    public function product($id){
+
+        $product = Products::find($id);
+
+        $kitchens = DB::table('kitchen_types')->get();
+
+        return view('admin.restaurant.product', compact('product', 'kitchens'));
+
+    }
+
+    public function updateProduct($id, Request $request){
+        $rules = [
+            'name' => 'required|regex:/^[\pL\s\-]+$/u|min:2|max:40',
+            'description' => 'required|min:2|max:512',
+            'ingredients' => 'required',
+            'image' => 'image'
+        ];
+        $validator = Validator::make($request->all(),$rules);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();// $validator->errors()->all();;
+        }
+
+        $product = Products::find($id);
+
+        $product -> fill($request -> all());
+
+        $product -> save();
+
+
+        return redirect('/admin/restaurant/'.$product->restaurants_id.'/menu');
+
+    }
+
 }

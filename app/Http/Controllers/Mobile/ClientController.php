@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Mobile;
 
 use App\Client;
 use App\Preference;
+use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -180,6 +181,11 @@ class ClientController extends Controller
     }
 
     public function editUser(Request $request){
+
+
+      //  return $request->photo->extension();
+
+       // dd($request-> photo);
         $rules = [
             "email" => 'email|min:2',
             "password" => 'min:6|max:40',
@@ -202,11 +208,13 @@ class ClientController extends Controller
             $client -> fill($request -> all());
             if($request -> password)
             $client -> password = bcrypt($request -> password);
-            if( $request-> file) {
-                $request->file->move('images', $request->file->getClientOriginalName() . $request->file->extension());
-                $client->photo = 'images/' . $request->file->getClientOriginalName() . $request->file->extension();
+            if( $request-> photo) {
+                $date = Carbon::now();
+                $request->photo->move('images/clients', $date->timestamp.$request->photo->getClientOriginalName());
+                $client->photo = 'images/clients/' .$date->timestamp.$request->photo->getClientOriginalName();
             }
             //$client -> token =  str_random(32);
+
             $client -> save();
         }
         catch(QueryException $e){

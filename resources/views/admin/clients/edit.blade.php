@@ -80,7 +80,7 @@
 <p>age</p>
 <input type="" name="age" id="" value="{{old('age',$client ->age)}}">
 <p>photo</p>
-{{--<input type="" name="photo" id="">--}} Сделай!!!!!!!!!! а не как обычно
+<input type="file" name="photo" id=""> Сделай!!!!!!!!!! а не как обычно
 
     @if ($errors->any()&& $errors -> first('reviewer'))
         <div class="alert alert-danger">

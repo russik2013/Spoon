@@ -74,6 +74,13 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 //////////////////////////////Контроль ресторанов/////////////////////////////////////
     Route::group(['prefix' => 'restaurant', 'middleware' => 'auth'], function () {
 
+        Route::get('/','Admin\RestaurantController@index');
+        Route::get('{id}/edit','Admin\RestaurantController@edit');
+        Route::post('{id}/update','Admin\RestaurantController@update');
+        Route::get('{id}/menu','Admin\RestaurantController@menu');
+        Route::get('{id}/product','Admin\RestaurantController@product');
+        Route::post('{id}/update','Admin\RestaurantController@updateProduct');
+
 
         Route::group(['prefix' => 'preference'], function () {
 
@@ -93,8 +100,6 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::post('/all', 'Admin\RegisterKeyController@getAllKeys')->middleware('admin_restaurant');
         Route::post('/delete', 'Admin\RegisterKeyController@delete')->middleware('admin_restaurant');
         Route::post('/get', 'Admin\RegisterKeyController@getKey')->middleware('admin_restaurant');
-
-
     });
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -107,9 +112,6 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::post('/{id}/update', 'Admin\ClientController@update')->middleware('admin_restaurant');
         Route::post('/change', 'Admin\ClientController@changeStatus')->middleware('admin_restaurant');
         Route::post('/reviewer', 'Admin\ClientController@changeReviewer')->middleware('admin_restaurant');
-
-
-
     });
 
 /////////////////////////////////////////////////////////////////////////////////////////////////

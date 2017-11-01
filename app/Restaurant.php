@@ -12,5 +12,10 @@ class Restaurant extends Model
         'rating','display_tables','number_of_free_tables','role'
     ];
 
+    function products(){
+
+        return $this -> hasMany('App\Products','restaurants_id');
+
+    }
 
 }
