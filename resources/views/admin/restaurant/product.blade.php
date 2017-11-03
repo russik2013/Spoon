@@ -1,5 +1,5 @@
 
-<form  method="post" action="{{url('admin/restaurant/'.$product ->id.'/update')}}" enctype="multipart/form-data">
+<form  method="post" action="{{url('admin/restaurant/'.$product ->id.'/updateProduct')}}" enctype="multipart/form-data">
     <input type="hidden" name="_token" value="{{csrf_token()}}">
     <input type="hidden" name="_method" value="POST">
     @if ($errors->any()&& $errors -> first('name'))

@@ -20,6 +20,7 @@
         <th rowspan="2">Показывать столики</th>
         <th rowspan="2">Количество свободных столиков</th>
         <th rowspan="2">Меню</th>
+        <th rowspan="2">Комментарии</th>
     </tr>
     <tr>
         <th>Подедельник</th>
@@ -56,6 +57,7 @@
             <td>{{$restaurant -> display_tables}}</td>
             <td>{{$restaurant -> number_of_free_tables}}</td>
             <td class="menu_1"><button onclick="showMenu({{$restaurant-> id}})">Меню</button></td>
+            <td class="comments_1"><button onclick="showComments({{$restaurant-> id}})">Комментарии</button></td>
         </tr>
 
         @endforeach
@@ -74,11 +76,22 @@
 
             return false
         });
+
+        $(document).on('click', '.comments_1', function () {
+
+            return false
+        });
     });
 
     function showMenu(id) {
 
         location.href = '{{url('/admin/restaurant/')}}' + '/' + id + '/menu';
+
+
+    }
+    function showComments(id) {
+
+        location.href = '{{url('/admin/restaurant/comments/')}}' + '/' + id;
 
 
     }

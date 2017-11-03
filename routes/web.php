@@ -79,8 +79,13 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::post('{id}/update','Admin\RestaurantController@update');
         Route::get('{id}/menu','Admin\RestaurantController@menu');
         Route::get('{id}/product','Admin\RestaurantController@product');
-        Route::post('{id}/update','Admin\RestaurantController@updateProduct');
+        Route::post('{id}/updateProduct','Admin\RestaurantController@updateProduct');
 
+        Route::group(['prefix' => 'comments'], function () {
+
+            Route::get('/{restaurant}', 'Admin\CommentsController@index');
+
+        });
 
         Route::group(['prefix' => 'preference'], function () {
 

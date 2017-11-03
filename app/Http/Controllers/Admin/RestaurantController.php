@@ -22,13 +22,46 @@ class RestaurantController extends Controller
 
     public function edit($id){
 
+
         $restaurant = Restaurant::find($id);
+
+        $monday = explode('-', $restaurant -> monday);
+        $tuesday = explode('-', $restaurant -> tuesday);
+        $wednesday = explode('-', $restaurant -> wednesday);
+        $thursday = explode('-', $restaurant -> thursday);
+        $friday = explode('-', $restaurant -> friday);
+        $saturday = explode('-', $restaurant -> saturday);
+        $sunday = explode('-', $restaurant -> sunday);
+
+        $restaurant -> monday_from = $monday[0];
+        $restaurant -> monday_to = $monday[1];
+
+        $restaurant ->tuesday_from = $tuesday[0];
+        $restaurant ->tuesday_to = $tuesday[1];
+
+        $restaurant ->wednesday_from = $wednesday[0];
+        $restaurant ->wednesday_to = $wednesday[1];
+
+        $restaurant ->thursday_from = $thursday[0];
+        $restaurant ->thursday_to = $thursday[1];
+
+        $restaurant ->friday_from = $friday[0];
+        $restaurant ->friday_to = $friday[1];
+
+        $restaurant ->saturday_from = $saturday[0];
+        $restaurant ->saturday_to = $saturday[1];
+
+        $restaurant ->sunday_from = $sunday[0];
+        $restaurant ->sunday_to = $sunday[1];
+
+
 
         return view('admin.restaurant.edit', compact('restaurant'));
 
     }
 
     public function update($id, Request $request){
+        //dd($request -> all());
         $rules = [
             'password' => 'min:2|max:40',
             'name' => 'alpha_dash|min:2|max:40',
@@ -62,6 +95,18 @@ class RestaurantController extends Controller
         $restaurant = Restaurant::find($id);
 
         $restaurant ->fill($request -> all());
+
+        $restaurant -> monday = $request -> monday_from . '-'. $request -> monday_to;
+        $restaurant -> tuesday = $request -> tuesday_from . '-'. $request -> tuesday_to;
+        $restaurant -> wednesday = $request -> wednesday_from . '-'. $request -> wednesday_to;
+        $restaurant -> thursday = $request -> thursday_from . '-'. $request -> thursday_to;
+        $restaurant -> friday = $request -> friday_from . '-'. $request -> friday_to;
+        $restaurant -> saturday = $request -> saturday_from . '-'. $request -> saturday_to;
+        $restaurant -> sunday = $request -> sunday_from . '-'. $request -> sunday_to;
+
+        if(isset($request-> specify_time))
+            $restaurant -> specify_time = 1;
+        else $restaurant -> specify_time = 0;
 
         $restaurant -> save();
 

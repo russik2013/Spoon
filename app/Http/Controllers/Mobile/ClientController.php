@@ -194,7 +194,7 @@ class ClientController extends Controller
             "middleName"=> 'alpha_dash|min:2|max:40',
             "nickName"=> 'alpha_dash|min:2|max:40',
             "sex" => 'in:MEN,WOMEN,ELSE',
-            "age" => 'between:3,300',
+            "age" => 'numeric|between:3,300',
             "photo" => 'image',
             "rating" => 'between:0,100'
         ];
